@@ -9,7 +9,7 @@ let currentUser = null;
 let isAuthenticated = false;
 
 // DOM Elements
-let authModal, mainApp, loginForm, registerForm, showRegisterBtn, showLoginBtn, logoutBtn, userName, userType, userMenu;
+let authModal, mainApp, loginFormContainer, registerFormContainer, showRegisterBtn, showLoginBtn, logoutBtn, userName, userType, userMenu;
 
 // Debug logging
 console.log('Ripplab Authentication System Initializing...');
@@ -56,20 +56,20 @@ function hideAuthModal() {
 function showLoginForm() {
     console.log('Showing login form');
     
-    if (loginForm && registerForm) {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
+    if (loginFormContainer && registerFormContainer) {
+        loginFormContainer.style.display = 'block';
+        registerFormContainer.style.display = 'none';
         console.log('Login form displayed, register form hidden');
         
         // Focus on email input
-        const emailInput = loginForm.querySelector('#loginEmail');
+        const emailInput = loginFormContainer.querySelector('#loginEmail');
         if (emailInput) {
             emailInput.focus();
         }
     } else {
         console.error('Login or register form elements not found:', {
-            loginForm: !!loginForm,
-            registerForm: !!registerForm
+            loginFormContainer: !!loginFormContainer,
+            registerFormContainer: !!registerFormContainer
         });
     }
 }
@@ -77,20 +77,20 @@ function showLoginForm() {
 function showRegisterForm() {
     console.log('Showing register form');
     
-    if (loginForm && registerForm) {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
+    if (loginFormContainer && registerFormContainer) {
+        loginFormContainer.style.display = 'none';
+        registerFormContainer.style.display = 'block';
         console.log('Register form displayed, login form hidden');
         
         // Focus on name input
-        const nameInput = registerForm.querySelector('#registerName');
+        const nameInput = registerFormContainer.querySelector('#registerName');
         if (nameInput) {
             nameInput.focus();
         }
     } else {
         console.error('Login or register form elements not found:', {
-            loginForm: !!loginForm,
-            registerForm: !!registerForm
+            loginFormContainer: !!loginFormContainer,
+            registerFormContainer: !!registerFormContainer
         });
     }
 }
@@ -649,8 +649,8 @@ function initAuthSystem() {
     const requiredElements = {
         authModal: document.getElementById('authModal'),
         mainApp: document.getElementById('mainApp'),
-        loginForm: document.getElementById('loginForm'),
-        registerForm: document.getElementById('registerForm'),
+        loginFormContainer: document.getElementById('loginForm'),
+        registerFormContainer: document.getElementById('registerForm'),
         userName: document.getElementById('userName'),
         userType: document.getElementById('userType'),
         logoutBtn: document.getElementById('logoutBtn')
@@ -703,8 +703,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 Looking for DOM elements...');
     authModal = document.getElementById('authModal');
     mainApp = document.getElementById('mainApp');
-    loginForm = document.getElementById('loginForm');
-    registerForm = document.getElementById('registerForm');
+    loginFormContainer = document.getElementById('loginForm');
+    registerFormContainer = document.getElementById('registerForm');
     showRegisterBtn = document.getElementById('showRegister');
     showLoginBtn = document.getElementById('showLogin');
     logoutBtn = document.getElementById('logoutBtn');
@@ -714,8 +714,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 DOM elements found:', {
         authModal: !!authModal,
         mainApp: !!mainApp,
-        loginForm: !!loginForm,
-        registerForm: !!registerForm,
+        loginFormContainer: !!loginFormContainer,
+        registerFormContainer: !!registerFormContainer,
         showRegisterBtn: !!showRegisterBtn,
         showLoginBtn: !!showLoginBtn,
         logoutBtn: !!logoutBtn,
@@ -727,8 +727,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Elements found after DOM loaded:', {
         authModal: !!authModal,
         mainApp: !!mainApp,
-        loginForm: !!loginForm,
-        registerForm: !!registerForm,
+        loginFormContainer: !!loginFormContainer,
+        registerFormContainer: !!registerFormContainer,
         showRegisterBtn: !!showRegisterBtn,
         showLoginBtn: !!showLoginBtn,
         logoutBtn: !!logoutBtn,
