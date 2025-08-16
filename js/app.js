@@ -16,40 +16,85 @@ const userName = document.getElementById('userName');
 const userType = document.getElementById('userType');
 const userMenu = document.getElementById('userMenu');
 
+// Debug logging
+console.log('DOM Elements found:', {
+    authModal: !!authModal,
+    mainApp: !!mainApp,
+    loginForm: !!loginForm,
+    registerForm: !!registerForm,
+    showRegisterBtn: !!showRegisterBtn,
+    showLoginBtn: !!showLoginBtn,
+    logoutBtn: !!logoutBtn,
+    userName: !!userName,
+    userType: !!userType,
+    userMenu: !!userMenu
+});
+
 // Authentication Functions
 function showAuthModal() {
-    authModal.style.display = 'flex';
-    mainApp.style.display = 'none';
+    console.log('Showing auth modal');
+    if (authModal && mainApp) {
+        authModal.style.display = 'flex';
+        mainApp.style.display = 'none';
+        console.log('Auth modal displayed, main app hidden');
+    } else {
+        console.error('Auth modal or main app elements not found');
+    }
 }
 
 function hideAuthModal() {
-    authModal.style.display = 'none';
-    mainApp.style.display = 'block';
+    console.log('Hiding auth modal');
+    if (authModal && mainApp) {
+        authModal.style.display = 'none';
+        mainApp.style.display = 'block';
+        console.log('Auth modal hidden, main app displayed');
+    } else {
+        console.error('Auth modal or main app elements not found');
+    }
 }
 
 function showLoginForm() {
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
+    console.log('Showing login form');
+    if (loginForm && registerForm) {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        console.log('Login form displayed, register form hidden');
+    } else {
+        console.error('Login or register form elements not found');
+    }
 }
 
 function showRegisterForm() {
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'block';
+    console.log('Showing register form');
+    if (loginForm && registerForm) {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        console.log('Register form displayed, login form hidden');
+    } else {
+        console.error('Login or register form elements not found');
+    }
 }
 
 function authenticateUser(userData) {
+    console.log('Authenticating user:', userData);
     currentUser = userData;
     isAuthenticated = true;
     
     // Update UI
-    userName.textContent = userData.name;
-    userType.textContent = userData.type === 'buyer' ? 'Alıcı' : 'Satıcı';
+    if (userName && userType) {
+        userName.textContent = userData.name;
+        userType.textContent = userData.type === 'buyer' ? 'Alıcı' : 'Satıcı';
+        console.log('UI updated with user info');
+    } else {
+        console.error('User name or type elements not found');
+    }
     
     // Hide auth modal and show main app
     hideAuthModal();
     
     // Save to localStorage
     localStorage.setItem('ripplab_user', JSON.stringify(userData));
+    console.log('User data saved to localStorage');
     
     // Show welcome message
     showNotification(`Hoş geldiniz, ${userData.name}!`, 'success');
@@ -72,11 +117,15 @@ function logoutUser() {
 // Form Handling
 function handleLogin(event) {
     event.preventDefault();
+    console.log('Login form submitted');
     
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
+    console.log('Login attempt with email:', email);
+    
     if (!email || !password) {
+        console.log('Login failed: missing fields');
         showNotification('Lütfen tüm alanları doldurun', 'error');
         return;
     }
@@ -93,6 +142,7 @@ function handleLogin(event) {
             id: Date.now()
         };
         
+        console.log('Login successful, user data:', userData);
         authenticateUser(userData);
     }, 1500);
 }
@@ -334,9 +384,12 @@ function hideMusicPlayerModal() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Setting up authentication system');
+    
     // Check if user is already authenticated
     const savedUser = localStorage.getItem('ripplab_user');
     if (savedUser) {
+        console.log('Found saved user:', savedUser);
         currentUser = JSON.parse(savedUser);
         isAuthenticated = true;
         hideAuthModal();
@@ -345,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userName.textContent = currentUser.name;
         userType.textContent = currentUser.type === 'buyer' ? 'Alıcı' : 'Satıcı';
     } else {
+        console.log('No saved user found, showing auth modal');
         showAuthModal();
     }
     
@@ -353,10 +407,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerFormElement = document.querySelector('.register-form');
     
     if (loginFormElement) {
+        console.log('Adding submit listener to login form');
         loginFormElement.addEventListener('submit', handleLogin);
     }
     
     if (registerFormElement) {
+        console.log('Adding submit listener to register form');
         registerFormElement.addEventListener('submit', handleRegister);
     }
     
@@ -378,6 +434,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Social login buttons
     const facebookBtns = document.querySelectorAll('.facebook-btn');
     const googleBtns = document.querySelectorAll('.google-btn');
+    
+    console.log('Social login buttons found:', {
+        facebook: facebookBtns.length,
+        google: googleBtns.length
+    });
     
     facebookBtns.forEach(btn => {
         btn.addEventListener('click', handleFacebookLogin);
