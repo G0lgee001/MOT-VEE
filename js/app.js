@@ -37,7 +37,7 @@ function showAuthModal() {
     const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
-        authModal.classList.add('show');
+        authModal.classList.remove('hidden');
         mainApp.style.display = 'none';
         console.log('Auth modal displayed, main app hidden');
     } else {
@@ -54,7 +54,7 @@ function hideAuthModal() {
     const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
-        authModal.classList.remove('show');
+        authModal.classList.add('hidden');
         mainApp.style.display = 'block';
         console.log('Auth modal hidden, main app displayed');
     } else {
