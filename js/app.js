@@ -16,7 +16,7 @@ function showAuthModal() {
     
     if (authModal && mainApp) {
         authModal.classList.remove('hidden');
-        mainApp.style.display = 'none';
+        mainApp.classList.add('hidden');
         console.log('Auth modal displayed, main app hidden');
         
         // Focus on first input
@@ -37,7 +37,7 @@ function hideAuthModal() {
     
     if (authModal && mainApp) {
         authModal.classList.add('hidden');
-        mainApp.style.display = 'block';
+        mainApp.classList.remove('hidden');
         console.log('Auth modal hidden, main app displayed');
     } else {
         console.error('Auth modal or main app elements not found:', {
@@ -637,6 +637,29 @@ function checkAuthStatus() {
 function initAuthSystem() {
     console.log('Initializing authentication system...');
     
+    // Verify all required elements exist
+    const requiredElements = {
+        authModal: document.getElementById('authModal'),
+        mainApp: document.getElementById('mainApp'),
+        loginForm: document.getElementById('loginForm'),
+        registerForm: document.getElementById('registerForm'),
+        userName: document.getElementById('userName'),
+        userType: document.getElementById('userType'),
+        logoutBtn: document.getElementById('logoutBtn')
+    };
+    
+    const missingElements = Object.entries(requiredElements)
+        .filter(([name, element]) => !element)
+        .map(([name]) => name);
+    
+    if (missingElements.length > 0) {
+        console.error('Missing required elements:', missingElements);
+        showNotification(`Eksik elementler: ${missingElements.join(', ')}`, 'error');
+        return false;
+    }
+    
+    console.log('All required elements found');
+    
     // Check if user is already authenticated
     if (!checkAuthStatus()) {
         console.log('User not authenticated, showing auth modal');
@@ -645,6 +668,8 @@ function initAuthSystem() {
         console.log('User authenticated, showing main app');
         showNotification(`Tekrar hoş geldiniz, ${currentUser.name}!`, 'success');
     }
+    
+    return true;
 }
 
 // User Activity Monitoring
@@ -689,6 +714,13 @@ document.addEventListener('DOMContentLoaded', () => {
         userMenu: !!userMenu
     });
     
+    // Verify critical elements exist
+    if (!authModal || !mainApp) {
+        console.error('Critical elements missing - cannot initialize authentication system');
+        showNotification('Kritik elementler eksik - kimlik doğrulama sistemi başlatılamıyor', 'error');
+        return;
+    }
+    
     // Initialize authentication system
     initAuthSystem();
     
@@ -719,11 +751,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginFormElement) {
         console.log('Adding submit listener to login form');
         loginFormElement.addEventListener('submit', handleLogin);
+    } else {
+        console.error('Login form not found');
     }
     
     if (registerFormElement) {
         console.log('Adding submit listener to register form');
         registerFormElement.addEventListener('submit', handleRegister);
+    } else {
+        console.error('Register form not found');
     }
     
     // Navigation between forms
@@ -750,13 +786,21 @@ document.addEventListener('DOMContentLoaded', () => {
         google: googleBtns.length
     });
     
-    facebookBtns.forEach(btn => {
-        btn.addEventListener('click', handleFacebookLogin);
-    });
+    if (facebookBtns.length === 0) {
+        console.error('No Facebook login buttons found');
+    } else {
+        facebookBtns.forEach(btn => {
+            btn.addEventListener('click', handleFacebookLogin);
+        });
+    }
     
-    googleBtns.forEach(btn => {
-        btn.addEventListener('click', handleGoogleLogin);
-    });
+    if (googleBtns.length === 0) {
+        console.error('No Google login buttons found');
+    } else {
+        googleBtns.forEach(btn => {
+            btn.addEventListener('click', handleGoogleLogin);
+        });
+    }
     
     // Logout
     if (logoutBtn) {
@@ -977,4 +1021,8 @@ console.log(`
 ✨ Social login with Facebook & Google
 💼 Buyer/Seller account types
 🚀 Built with modern web technologies
+🔒 Page protection: Main content hidden until login
+📱 Responsive design for all devices
+🎨 Modern UI with glassmorphism effects
+⚡ Optimized performance and animations
 `);

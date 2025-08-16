@@ -45,8 +45,23 @@ body {
 }
 
 .auth-modal.hidden {
-    display: none;
+    display: none !important;
 }
+
+/* Main App */
+.main-app {
+    display: block;
+    min-height: 100vh;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.main-app.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
+
 
 .auth-container {
     background: var(--white);
@@ -178,6 +193,50 @@ body {
     padding: 1rem;
     font-size: 1rem;
     font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-full:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+    background: var(--light-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--border);
+    transform: translateY(-2px);
 }
 
 /* Divider */
@@ -269,7 +328,40 @@ body {
 /* Account Type Cards */
 .type-card {
     border: 2px solid var(--light-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
     transition: all 0.3s ease;
+    cursor: pointer;
+    background: var(--white);
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.password-strength.weak {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.password-strength.medium {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+.password-strength.strong {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
 }
 
 .type-card.active {
@@ -481,6 +573,93 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+/* User Menu */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.user-type {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: var(--light-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    margin-top: 0.25rem;
+}
+
+.user-menu {
+    position: relative;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.user-menu:hover {
+    background: var(--light-bg);
+}
+
+.user-menu i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.user-menu:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--light-bg);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: var(--light-bg);
+    color: var(--primary);
+}
+
+.dropdown-item i {
+    font-size: 1rem;
+    width: 16px;
 }
 
 .btn {
@@ -1382,5 +1561,62 @@ body {
     
     .social-login {
         flex-direction: column;
+    }
+    
+    /* Authentication Modal Mobile Optimizations */
+    .auth-modal {
+        padding: 0.5rem;
+    }
+    
+    .auth-container {
+        margin: 0.5rem;
+        border-radius: 16px;
+    }
+    
+    .auth-form {
+        padding: 1rem 0.75rem;
+    }
+    
+    .auth-header .logo-icon {
+        font-size: 1.75rem;
+    }
+    
+    .auth-header .logo-text {
+        font-size: 1.25rem;
+    }
+    
+    .auth-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.8rem;
+    }
+    
+    .form-group input {
+        padding: 0.625rem;
+        font-size: 0.8rem;
+    }
+    
+    .btn-full {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .social-btn {
+        padding: 0.625rem;
+        font-size: 0.75rem;
+    }
+    
+    .divider {
+        margin: 1.5rem 0;
+    }
+    
+    .auth-footer {
+        font-size: 0.875rem;
     }
 }
