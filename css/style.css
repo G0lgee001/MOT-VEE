@@ -61,6 +61,11 @@ body {
     opacity: 0;
 }
 
+/* General hidden class */
+.hidden {
+    display: none !important;
+}
+
 
 
 .auth-container {

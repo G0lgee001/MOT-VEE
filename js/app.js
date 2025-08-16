@@ -18,11 +18,21 @@ console.log('Global variables initialized:', { currentUser, isAuthenticated });
 // Authentication Functions
 function showAuthModal() {
     console.log('👁️ Showing auth modal');
+    console.log('🔍 Elements check:', {
+        authModal: authModal,
+        mainApp: mainApp,
+        authModalClasses: authModal ? authModal.className : 'null',
+        mainAppClasses: mainApp ? mainApp.className : 'null'
+    });
     
     if (authModal && mainApp) {
         authModal.classList.remove('hidden');
         mainApp.classList.add('hidden');
         console.log('✅ Auth modal displayed, main app hidden');
+        console.log('🔍 After change:', {
+            authModalClasses: authModal.className,
+            mainAppClasses: mainApp.className
+        });
         
         // Focus on first input
         const firstInput = authModal.querySelector('input');
@@ -656,17 +666,19 @@ function initAuthSystem() {
         logoutBtn: document.getElementById('logoutBtn')
     };
     
+    console.log('🔍 Required elements check:', requiredElements);
+    
     const missingElements = Object.entries(requiredElements)
         .filter(([name, element]) => !element)
         .map(([name]) => name);
     
     if (missingElements.length > 0) {
-        console.error('Missing required elements:', missingElements);
+        console.error('❌ Missing required elements:', missingElements);
         showNotification(`Eksik elementler: ${missingElements.join(', ')}`, 'error');
         return false;
     }
     
-    console.log('All required elements found');
+    console.log('✅ All required elements found');
     
     // Check if user is already authenticated
     console.log('🔍 Checking if user is already authenticated...');
@@ -698,6 +710,8 @@ function setupActivityMonitoring() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🌊 DOM Content Loaded - Setting up authentication system');
     console.log('Document ready, starting initialization...');
+    console.log('🔍 Document body:', document.body);
+    console.log('🔍 Document readyState:', document.readyState);
     
     // Initialize DOM elements after DOM is loaded
     console.log('🔍 Looking for DOM elements...');
@@ -711,6 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
     userName = document.getElementById('userName');
     userType = document.getElementById('userType');
     userMenu = document.getElementById('userMenu');
+    
     console.log('🔍 DOM elements found:', {
         authModal: !!authModal,
         mainApp: !!mainApp,
@@ -724,17 +739,11 @@ document.addEventListener('DOMContentLoaded', () => {
         userMenu: !!userMenu
     });
     
-    console.log('DOM Elements found after DOM loaded:', {
-        authModal: !!authModal,
-        mainApp: !!mainApp,
-        loginFormContainer: !!loginFormContainer,
-        registerFormContainer: !!registerFormContainer,
-        showRegisterBtn: !!showRegisterBtn,
-        showLoginBtn: !!showLoginBtn,
-        logoutBtn: !!logoutBtn,
-        userName: !!userName,
-        userType: !!userType,
-        userMenu: !!userMenu
+    console.log('🔍 Element details:', {
+        authModal: authModal,
+        mainApp: mainApp,
+        authModalId: authModal ? authModal.id : 'null',
+        mainAppId: mainApp ? mainApp.id : 'null'
     });
     
     // Verify critical elements exist
@@ -749,6 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ Critical elements verified successfully');
     
     // Initialize authentication system
+    console.log('🚀 Calling initAuthSystem...');
     initAuthSystem();
     
     // Setup password toggles
