@@ -5,41 +5,25 @@ let currentUser = null;
 let isAuthenticated = false;
 
 // DOM Elements
-const authModal = document.getElementById('authModal');
-const mainApp = document.getElementById('mainApp');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const showRegisterBtn = document.getElementById('showRegister');
-const showLoginBtn = document.getElementById('showLogin');
-const logoutBtn = document.getElementById('logoutBtn');
-const userName = document.getElementById('userName');
-const userType = document.getElementById('userType');
-const userMenu = document.getElementById('userMenu');
+let authModal, mainApp, loginForm, registerForm, showRegisterBtn, showLoginBtn, logoutBtn, userName, userType, userMenu;
 
 // Debug logging
-console.log('DOM Elements found:', {
-    authModal: !!authModal,
-    mainApp: !!mainApp,
-    loginForm: !!loginForm,
-    registerForm: !!registerForm,
-    showRegisterBtn: !!showRegisterBtn,
-    showLoginBtn: !!showLoginBtn,
-    logoutBtn: !!logoutBtn,
-    userName: !!userName,
-    userType: !!userType,
-    userMenu: !!userMenu
-});
+console.log('Ripplab Authentication System Initializing...');
 
 // Authentication Functions
 function showAuthModal() {
     console.log('Showing auth modal');
-    const authModal = document.getElementById('authModal');
-    const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
         authModal.classList.remove('hidden');
         mainApp.style.display = 'none';
         console.log('Auth modal displayed, main app hidden');
+        
+        // Focus on first input
+        const firstInput = authModal.querySelector('input');
+        if (firstInput) {
+            firstInput.focus();
+        }
     } else {
         console.error('Auth modal or main app elements not found:', {
             authModal: !!authModal,
@@ -50,8 +34,6 @@ function showAuthModal() {
 
 function hideAuthModal() {
     console.log('Hiding auth modal');
-    const authModal = document.getElementById('authModal');
-    const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
         authModal.classList.add('hidden');
@@ -67,13 +49,17 @@ function hideAuthModal() {
 
 function showLoginForm() {
     console.log('Showing login form');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
     
     if (loginForm && registerForm) {
         loginForm.style.display = 'block';
         registerForm.style.display = 'none';
         console.log('Login form displayed, register form hidden');
+        
+        // Focus on email input
+        const emailInput = loginForm.querySelector('#loginEmail');
+        if (emailInput) {
+            emailInput.focus();
+        }
     } else {
         console.error('Login or register form elements not found:', {
             loginForm: !!loginForm,
@@ -84,13 +70,17 @@ function showLoginForm() {
 
 function showRegisterForm() {
     console.log('Showing register form');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
     
     if (loginForm && registerForm) {
         loginForm.style.display = 'none';
         registerForm.style.display = 'block';
         console.log('Register form displayed, login form hidden');
+        
+        // Focus on name input
+        const nameInput = registerForm.querySelector('#registerName');
+        if (nameInput) {
+            nameInput.focus();
+        }
     } else {
         console.error('Login or register form elements not found:', {
             loginForm: !!loginForm,
@@ -99,15 +89,36 @@ function showRegisterForm() {
     }
 }
 
+// Session Management
+let sessionTimeout;
+
+function resetSessionTimeout() {
+    if (sessionTimeout) {
+        clearTimeout(sessionTimeout);
+    }
+    
+    // Set session timeout to 30 minutes (1800000 ms)
+    sessionTimeout = setTimeout(() => {
+        console.log('Session timeout, logging out user');
+        showNotification('Oturum süresi doldu, lütfen tekrar giriş yapın', 'warning');
+        logoutUser();
+    }, 1800000);
+}
+
+function clearSessionTimeout() {
+    if (sessionTimeout) {
+        clearTimeout(sessionTimeout);
+        sessionTimeout = null;
+    }
+}
+
+// Enhanced Authentication
 function authenticateUser(userData) {
     console.log('Authenticating user:', userData);
     currentUser = userData;
     isAuthenticated = true;
     
     // Update UI
-    const userName = document.getElementById('userName');
-    const userType = document.getElementById('userType');
-    
     if (userName && userType) {
         userName.textContent = userData.name;
         userType.textContent = userData.type === 'buyer' ? 'Alıcı' : 'Satıcı';
@@ -115,7 +126,7 @@ function authenticateUser(userData) {
     } else {
         console.error('User name or type elements not found:', {
             userName: !!userName,
-            userType: !!userType
+            userType: !!userName
         });
     }
     
@@ -126,16 +137,29 @@ function authenticateUser(userData) {
     localStorage.setItem('ripplab_user', JSON.stringify(userData));
     console.log('User data saved to localStorage');
     
+    // Start session timeout
+    resetSessionTimeout();
+    
     // Show welcome message
     showNotification(`Hoş geldiniz, ${userData.name}!`, 'success');
+    
+    // Update page title
+    document.title = `Ripplab - ${userData.name}`;
 }
 
 function logoutUser() {
+    console.log('Logging out user');
     currentUser = null;
     isAuthenticated = false;
     
+    // Clear session timeout
+    clearSessionTimeout();
+    
     // Clear localStorage
     localStorage.removeItem('ripplab_user');
+    
+    // Reset page title
+    document.title = 'Ripplab - Müzik Pazar Yeri';
     
     // Show auth modal
     showAuthModal();
@@ -144,7 +168,111 @@ function logoutUser() {
     showNotification('Başarıyla çıkış yapıldı', 'info');
 }
 
-// Form Handling
+// Form Validation
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+    return password.length >= 6;
+}
+
+// Password Strength Validation
+function validatePasswordStrength(password) {
+    const checks = {
+        length: password.length >= 8,
+        lowercase: /[a-z]/.test(password),
+        uppercase: /[A-Z]/.test(password),
+        number: /\d/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    
+    const score = Object.values(checks).filter(Boolean).length;
+    
+    return {
+        score,
+        checks,
+        strength: score < 3 ? 'weak' : score < 4 ? 'medium' : 'strong'
+    };
+}
+
+function updatePasswordStrengthIndicator(password) {
+    const strengthIndicator = document.querySelector('.password-strength');
+    if (!strengthIndicator) return;
+    
+    const strength = validatePasswordStrength(password);
+    
+    strengthIndicator.className = `password-strength ${strength.strength}`;
+    strengthIndicator.textContent = `Şifre gücü: ${strength.strength === 'weak' ? 'Zayıf' : strength.strength === 'medium' ? 'Orta' : 'Güçlü'}`;
+}
+
+// Enhanced Form Validation
+function validateForm(formData) {
+    const errors = [];
+    
+    if (!formData.email || !validateEmail(formData.email)) {
+        errors.push('Geçerli bir e-posta adresi girin');
+    }
+    
+    if (!formData.password || !validatePassword(formData.password)) {
+        errors.push('Şifre en az 6 karakter olmalıdır');
+    }
+    
+    if (formData.name && formData.name.length < 2) {
+        errors.push('Ad en az 2 karakter olmalıdır');
+    }
+    
+    if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
+        errors.push('Şifreler eşleşmiyor');
+    }
+    
+    // Check password strength for registration
+    if (formData.password && formData.name) { // Registration form
+        const strength = validatePasswordStrength(formData.password);
+        if (strength.score < 3) {
+            errors.push('Şifre çok zayıf, daha güçlü bir şifre seçin');
+        }
+    }
+    
+    return errors;
+}
+
+// Remember Me Functionality
+function handleRememberMe(email, password) {
+    const rememberMe = document.querySelector('input[type="checkbox"]');
+    if (rememberMe && rememberMe.checked) {
+        localStorage.setItem('ripplab_remember', JSON.stringify({ email, password }));
+        console.log('Remember me enabled');
+    } else {
+        localStorage.removeItem('ripplab_remember');
+        console.log('Remember me disabled');
+    }
+}
+
+function loadRememberedCredentials() {
+    const remembered = localStorage.getItem('ripplab_remember');
+    if (remembered) {
+        try {
+            const { email, password } = JSON.parse(remembered);
+            const emailInput = document.getElementById('loginEmail');
+            const passwordInput = document.getElementById('loginPassword');
+            const rememberMe = document.querySelector('input[type="checkbox"]');
+            
+            if (emailInput && passwordInput && rememberMe) {
+                emailInput.value = email;
+                passwordInput.value = password;
+                rememberMe.checked = true;
+                console.log('Remembered credentials loaded');
+            }
+        } catch (error) {
+            console.error('Error loading remembered credentials:', error);
+            localStorage.removeItem('ripplab_remember');
+        }
+    }
+}
+
+// Enhanced Login Handler
 function handleLogin(event) {
     event.preventDefault();
     console.log('Login form submitted');
@@ -154,11 +282,15 @@ function handleLogin(event) {
     
     console.log('Login attempt with email:', email);
     
-    if (!email || !password) {
-        console.log('Login failed: missing fields');
-        showNotification('Lütfen tüm alanları doldurun', 'error');
+    // Validate form
+    const errors = validateForm({ email, password });
+    if (errors.length > 0) {
+        errors.forEach(error => showNotification(error, 'error'));
         return;
     }
+    
+    // Handle remember me
+    handleRememberMe(email, password);
     
     // Simulate login process
     showNotification('Giriş yapılıyor...', 'info');
@@ -179,22 +311,30 @@ function handleLogin(event) {
 
 function handleRegister(event) {
     event.preventDefault();
+    console.log('Register form submitted');
     
     const name = document.getElementById('registerName').value;
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     const confirmPassword = document.getElementById('registerConfirmPassword').value;
-    const accountType = document.querySelector('input[name="accountType"]:checked').value;
+    const accountType = document.querySelector('input[name="accountType"]:checked');
     const termsAccepted = document.querySelector('input[type="checkbox"]').checked;
     
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
-        showNotification('Lütfen tüm alanları doldurun', 'error');
+    // Validate form
+    const errors = validateForm({ 
+        name, 
+        email, 
+        password, 
+        confirmPassword 
+    });
+    
+    if (errors.length > 0) {
+        errors.forEach(error => showNotification(error, 'error'));
         return;
     }
     
-    if (password !== confirmPassword) {
-        showNotification('Şifreler eşleşmiyor', 'error');
+    if (!accountType) {
+        showNotification('Lütfen hesap türünü seçin', 'error');
         return;
     }
     
@@ -210,15 +350,58 @@ function handleRegister(event) {
         const userData = {
             name: name,
             email: email,
-            type: accountType,
+            type: accountType.value,
             id: Date.now()
         };
         
+        console.log('Registration successful, user data:', userData);
         authenticateUser(userData);
     }, 2000);
 }
 
-// Social Login Functions
+// Password Visibility Toggle
+function setupPasswordToggles() {
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    
+    passwordInputs.forEach(input => {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'password-toggle';
+        toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+        toggleBtn.style.cssText = `
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+        `;
+        
+        // Make input container relative
+        const container = input.parentElement;
+        container.style.position = 'relative';
+        
+        // Add toggle button
+        container.appendChild(toggleBtn);
+        
+        // Toggle functionality
+        toggleBtn.addEventListener('click', () => {
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+    });
+}
+
+// Enhanced Social Login
 function handleFacebookLogin() {
     showNotification('Facebook ile giriş yapılıyor...', 'info');
     
@@ -412,21 +595,86 @@ function hideMusicPlayerModal() {
     modal.classList.remove('show');
 }
 
+// Authentication Status Check
+function checkAuthStatus() {
+    console.log('Checking authentication status...');
+    
+    const savedUser = localStorage.getItem('ripplab_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            isAuthenticated = true;
+            console.log('User is authenticated:', currentUser);
+            
+            // Update UI
+            if (userName && userType) {
+                userName.textContent = currentUser.name;
+                userType.textContent = currentUser.type === 'buyer' ? 'Alıcı' : 'Satıcı';
+            }
+            
+            // Hide auth modal and show main app
+            hideAuthModal();
+            
+            // Reset session timeout
+            resetSessionTimeout();
+            
+            // Update page title
+            document.title = `Ripplab - ${currentUser.name}`;
+            
+            return true;
+        } catch (error) {
+            console.error('Error parsing saved user data:', error);
+            localStorage.removeItem('ripplab_user');
+            return false;
+        }
+    } else {
+        console.log('No saved user found');
+        return false;
+    }
+}
+
+// Initialize Authentication System
+function initAuthSystem() {
+    console.log('Initializing authentication system...');
+    
+    // Check if user is already authenticated
+    if (!checkAuthStatus()) {
+        console.log('User not authenticated, showing auth modal');
+        showAuthModal();
+    } else {
+        console.log('User authenticated, showing main app');
+        showNotification(`Tekrar hoş geldiniz, ${currentUser.name}!`, 'success');
+    }
+}
+
+// User Activity Monitoring
+function setupActivityMonitoring() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+        document.addEventListener(event, () => {
+            if (isAuthenticated) {
+                resetSessionTimeout();
+            }
+        });
+    });
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded - Setting up authentication system');
     
     // Initialize DOM elements after DOM is loaded
-    const authModal = document.getElementById('authModal');
-    const mainApp = document.getElementById('mainApp');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const showRegisterBtn = document.getElementById('showRegister');
-    const showLoginBtn = document.getElementById('showLogin');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const userName = document.getElementById('userName');
-    const userType = document.getElementById('userType');
-    const userMenu = document.getElementById('userMenu');
+    authModal = document.getElementById('authModal');
+    mainApp = document.getElementById('mainApp');
+    loginForm = document.getElementById('loginForm');
+    registerForm = document.getElementById('registerForm');
+    showRegisterBtn = document.getElementById('showRegister');
+    showLoginBtn = document.getElementById('showLogin');
+    logoutBtn = document.getElementById('logoutBtn');
+    userName = document.getElementById('userName');
+    userType = document.getElementById('userType');
+    userMenu = document.getElementById('userMenu');
     
     console.log('DOM Elements found after DOM loaded:', {
         authModal: !!authModal,
@@ -441,23 +689,28 @@ document.addEventListener('DOMContentLoaded', () => {
         userMenu: !!userMenu
     });
     
-    // Check if user is already authenticated
-    const savedUser = localStorage.getItem('ripplab_user');
-    if (savedUser) {
-        console.log('Found saved user:', savedUser);
-        currentUser = JSON.parse(savedUser);
-        isAuthenticated = true;
-        hideAuthModal();
-        
-        // Update UI
-        if (userName && userType) {
-            userName.textContent = currentUser.name;
-            userType.textContent = currentUser.type === 'buyer' ? 'Alıcı' : 'Satıcı';
-        }
-    } else {
-        console.log('No saved user found, showing auth modal');
-        showAuthModal();
+    // Initialize authentication system
+    initAuthSystem();
+    
+    // Setup password toggles
+    setupPasswordToggles();
+
+    // Setup activity monitoring
+    setupActivityMonitoring();
+    
+    // Setup password strength indicator
+    const registerPasswordInput = document.getElementById('registerPassword');
+    if (registerPasswordInput) {
+        registerPasswordInput.addEventListener('input', (e) => {
+            updatePasswordStrengthIndicator(e.target.value);
+        });
     }
+    
+    // Load remembered credentials
+    loadRememberedCredentials();
+    
+    // Setup account type selection
+    setupAccountTypeSelection();
     
     // Form submissions
     const loginFormElement = document.querySelector('.login-form');
@@ -687,6 +940,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 });
+
+// Account Type Selection
+function setupAccountTypeSelection() {
+    const accountTypeOptions = document.querySelectorAll('input[name="accountType"]');
+    const typeCards = document.querySelectorAll('.type-card');
+    
+    accountTypeOptions.forEach((option, index) => {
+        option.addEventListener('change', () => {
+            // Remove active class from all cards
+            typeCards.forEach(card => card.classList.remove('active'));
+            
+            // Add active class to selected card
+            if (option.checked) {
+                typeCards[index].classList.add('active');
+                console.log('Account type selected:', option.value);
+            }
+        });
+    });
+    
+    // Set initial active state
+    const checkedOption = document.querySelector('input[name="accountType"]:checked');
+    if (checkedOption) {
+        const index = Array.from(accountTypeOptions).indexOf(checkedOption);
+        if (index !== -1) {
+            typeCards[index].classList.add('active');
+        }
+    }
+}
 
 // Console Welcome Message
 console.log(`

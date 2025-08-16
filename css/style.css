@@ -266,13 +266,17 @@ body {
     display: none;
 }
 
+/* Account Type Cards */
 .type-card {
-    padding: 1.5rem 1rem;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    text-align: center;
+    border: 2px solid var(--light-bg);
     transition: all 0.3s ease;
-    background: var(--white);
+}
+
+.type-card.active {
+    border-color: var(--primary);
+    background: var(--light-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .type-card i {
@@ -1229,6 +1233,33 @@ body {
     display: flex;
     gap: 1rem;
     justify-content: center;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.password-strength.weak {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.password-strength.medium {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+.password-strength.strong {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
 }
 
 /* Responsive Design */
