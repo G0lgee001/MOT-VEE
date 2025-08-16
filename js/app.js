@@ -1,5 +1,9 @@
 // Ripplab Music Marketplace JavaScript with Authentication
 
+// Debug logging
+console.log('🌊 Ripplab JavaScript loading...');
+console.log('Current time:', new Date().toISOString());
+
 // Global Variables
 let currentUser = null;
 let isAuthenticated = false;
@@ -9,23 +13,25 @@ let authModal, mainApp, loginForm, registerForm, showRegisterBtn, showLoginBtn, 
 
 // Debug logging
 console.log('Ripplab Authentication System Initializing...');
+console.log('Global variables initialized:', { currentUser, isAuthenticated });
 
 // Authentication Functions
 function showAuthModal() {
-    console.log('Showing auth modal');
+    console.log('👁️ Showing auth modal');
     
     if (authModal && mainApp) {
         authModal.classList.remove('hidden');
         mainApp.classList.add('hidden');
-        console.log('Auth modal displayed, main app hidden');
+        console.log('✅ Auth modal displayed, main app hidden');
         
         // Focus on first input
         const firstInput = authModal.querySelector('input');
         if (firstInput) {
             firstInput.focus();
+            console.log('🎯 Focused on first input');
         }
     } else {
-        console.error('Auth modal or main app elements not found:', {
+        console.error('❌ Auth modal or main app elements not found:', {
             authModal: !!authModal,
             mainApp: !!mainApp
         });
@@ -33,14 +39,14 @@ function showAuthModal() {
 }
 
 function hideAuthModal() {
-    console.log('Hiding auth modal');
+    console.log('🙈 Hiding auth modal');
     
     if (authModal && mainApp) {
         authModal.classList.add('hidden');
         mainApp.classList.remove('hidden');
-        console.log('Auth modal hidden, main app displayed');
+        console.log('✅ Auth modal hidden, main app displayed');
     } else {
-        console.error('Auth modal or main app elements not found:', {
+        console.error('❌ Auth modal or main app elements not found:', {
             authModal: !!authModal,
             mainApp: !!mainApp
         });
@@ -597,14 +603,15 @@ function hideMusicPlayerModal() {
 
 // Authentication Status Check
 function checkAuthStatus() {
-    console.log('Checking authentication status...');
+    console.log('🔐 Checking authentication status...');
     
     const savedUser = localStorage.getItem('ripplab_user');
+    console.log('🔍 Checking localStorage for saved user:', savedUser);
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
             isAuthenticated = true;
-            console.log('User is authenticated:', currentUser);
+            console.log('✅ User is authenticated:', currentUser);
             
             // Update UI
             if (userName && userType) {
@@ -620,22 +627,23 @@ function checkAuthStatus() {
             
             // Update page title
             document.title = `Ripplab - ${currentUser.name}`;
+            console.log('✅ Authentication check completed successfully');
             
             return true;
         } catch (error) {
-            console.error('Error parsing saved user data:', error);
+            console.error('❌ Error parsing saved user data:', error);
             localStorage.removeItem('ripplab_user');
             return false;
         }
     } else {
-        console.log('No saved user found');
+        console.log('👤 No saved user found in localStorage');
         return false;
     }
 }
 
 // Initialize Authentication System
 function initAuthSystem() {
-    console.log('Initializing authentication system...');
+    console.log('🚀 Initializing authentication system...');
     
     // Verify all required elements exist
     const requiredElements = {
@@ -661,11 +669,12 @@ function initAuthSystem() {
     console.log('All required elements found');
     
     // Check if user is already authenticated
+    console.log('🔍 Checking if user is already authenticated...');
     if (!checkAuthStatus()) {
-        console.log('User not authenticated, showing auth modal');
+        console.log('👤 User not authenticated, showing auth modal');
         showAuthModal();
     } else {
-        console.log('User authenticated, showing main app');
+        console.log('👤 User authenticated, showing main app');
         showNotification(`Tekrar hoş geldiniz, ${currentUser.name}!`, 'success');
     }
     
@@ -687,9 +696,11 @@ function setupActivityMonitoring() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded - Setting up authentication system');
+    console.log('🌊 DOM Content Loaded - Setting up authentication system');
+    console.log('Document ready, starting initialization...');
     
     // Initialize DOM elements after DOM is loaded
+    console.log('🔍 Looking for DOM elements...');
     authModal = document.getElementById('authModal');
     mainApp = document.getElementById('mainApp');
     loginForm = document.getElementById('loginForm');
@@ -700,6 +711,18 @@ document.addEventListener('DOMContentLoaded', () => {
     userName = document.getElementById('userName');
     userType = document.getElementById('userType');
     userMenu = document.getElementById('userMenu');
+    console.log('🔍 DOM elements found:', {
+        authModal: !!authModal,
+        mainApp: !!mainApp,
+        loginForm: !!loginForm,
+        registerForm: !!registerForm,
+        showRegisterBtn: !!showRegisterBtn,
+        showLoginBtn: !!showLoginBtn,
+        logoutBtn: !!logoutBtn,
+        userName: !!userName,
+        userType: !!userType,
+        userMenu: !!userMenu
+    });
     
     console.log('DOM Elements found after DOM loaded:', {
         authModal: !!authModal,
@@ -715,11 +738,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Verify critical elements exist
+    console.log('🔍 Verifying critical elements...');
     if (!authModal || !mainApp) {
-        console.error('Critical elements missing - cannot initialize authentication system');
+        console.error('❌ Critical elements missing - cannot initialize authentication system');
+        console.error('authModal:', authModal);
+        console.error('mainApp:', mainApp);
         showNotification('Kritik elementler eksik - kimlik doğrulama sistemi başlatılamıyor', 'error');
         return;
     }
+    console.log('✅ Critical elements verified successfully');
     
     // Initialize authentication system
     initAuthSystem();
