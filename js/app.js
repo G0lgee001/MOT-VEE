@@ -37,7 +37,7 @@ function showAuthModal() {
     const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
-        authModal.style.display = 'flex';
+        authModal.classList.add('show');
         mainApp.style.display = 'none';
         console.log('Auth modal displayed, main app hidden');
     } else {
@@ -54,7 +54,7 @@ function hideAuthModal() {
     const mainApp = document.getElementById('mainApp');
     
     if (authModal && mainApp) {
-        authModal.style.display = 'none';
+        authModal.classList.remove('show');
         mainApp.style.display = 'block';
         console.log('Auth modal hidden, main app displayed');
     } else {
@@ -404,12 +404,12 @@ function showMusicPlayerModal(trackTitle, trackArtist) {
     trackArtistElement.textContent = trackArtist;
     
     // Show modal
-    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 function hideMusicPlayerModal() {
     const modal = document.getElementById('musicPlayerModal');
-    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // Event Listeners
@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             const modal = btn.closest('.modal');
             if (modal) {
-                modal.style.display = 'none';
+                modal.classList.remove('show');
             }
         });
     });
@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modals = document.querySelectorAll('.modal');
         modals.forEach(modal => {
             if (e.target === modal) {
-                modal.style.display = 'none';
+                modal.classList.remove('show');
             }
         });
     });
@@ -552,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') {
             const modals = document.querySelectorAll('.modal');
             modals.forEach(modal => {
-                if (modal.style.display === 'flex') {
-                    modal.style.display = 'none';
+                if (modal.classList.contains('show')) {
+                    modal.classList.remove('show');
                 }
             });
         }
