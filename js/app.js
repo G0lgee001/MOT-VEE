@@ -1,580 +1,572 @@
-// Ripplab Music Marketplace JavaScript
+// Ripplab Music Marketplace JavaScript with Authentication
+
+// Global Variables
+let currentUser = null;
+let isAuthenticated = false;
 
 // DOM Elements
-const navToggle = document.querySelector('.nav-toggle');
-const navMenu = document.querySelector('.nav-menu');
-const heroBtnBuyer = document.querySelector('.hero-btn-buyer');
-const heroBtnSeller = document.querySelector('.hero-btn-seller');
-const categoryBtns = document.querySelectorAll('.category-btn');
-const playBtns = document.querySelectorAll('.play-btn');
+const authModal = document.getElementById('authModal');
+const mainApp = document.getElementById('mainApp');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const showRegisterBtn = document.getElementById('showRegister');
+const showLoginBtn = document.getElementById('showLogin');
+const logoutBtn = document.getElementById('logoutBtn');
+const userName = document.getElementById('userName');
+const userType = document.getElementById('userType');
+const userMenu = document.getElementById('userMenu');
 
-// Sample Marketplace Data
-const marketplaceData = {
-    categories: [
-        {
-            name: "Beats",
-            count: "2.5K+",
-            price: "₺50",
-            description: "Hip-hop, Trap, EDM ve daha fazlası"
-        },
-        {
-            name: "Ses Efektleri",
-            count: "1.8K+",
-            price: "₺25",
-            description: "Foley, Ambient, FX ve daha fazlası"
-        },
-        {
-            name: "Albüm Kapakları",
-            count: "1.2K+",
-            price: "₺75",
-            description: "Vektör, Fotoğraf, 3D ve daha fazlası"
-        },
-        {
-            name: "Sample Packs",
-            count: "800+",
-            price: "₺100",
-            description: "Drum Kits, Melody Loops ve daha fazlası"
-        }
-    ],
-    trending: [
-        {
-            title: "Dark Trap Beat",
-            artist: "ProducerX",
-            price: "₺150",
-            rating: 4.8,
-            reviews: 120,
-            badge: "Trend"
-        },
-        {
-            title: "Lo-Fi Vibes",
-            artist: "ChillBeats",
-            price: "₺80",
-            rating: 4.9,
-            reviews: 89,
-            badge: "Yeni"
-        },
-        {
-            title: "EDM Drop",
-            artist: "EDMKing",
-            price: "₺200",
-            rating: 4.7,
-            reviews: 156,
-            badge: "Popüler"
-        }
-    ]
-};
-
-// Navigation Toggle
-if (navToggle) {
-    navToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        navToggle.classList.toggle('active');
-    });
+// Authentication Functions
+function showAuthModal() {
+    authModal.style.display = 'flex';
+    mainApp.style.display = 'none';
 }
 
-// Smooth Scrolling for Navigation Links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Hero Button Interactions
-if (heroBtnBuyer) {
-    heroBtnBuyer.addEventListener('click', () => {
-        // Add click animation
-        heroBtnBuyer.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            heroBtnBuyer.style.transform = 'scale(1)';
-        }, 150);
-        
-        // Simulate buyer action
-        console.log('Buyer button clicked - Redirecting to marketplace...');
-        
-        // Smooth scroll to categories
-        const categoriesSection = document.querySelector('#categories');
-        if (categoriesSection) {
-            categoriesSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
+function hideAuthModal() {
+    authModal.style.display = 'none';
+    mainApp.style.display = 'block';
 }
 
-if (heroBtnSeller) {
-    heroBtnSeller.addEventListener('click', () => {
-        // Add click animation
-        heroBtnSeller.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            heroBtnSeller.style.transform = 'scale(1)';
-        }, 150);
-        
-        // Simulate seller action
-        console.log('Seller button clicked - Redirecting to seller dashboard...');
-        
-        // Show seller registration modal or redirect
-        showSellerModal();
-    });
+function showLoginForm() {
+    loginForm.style.display = 'block';
+    registerForm.style.display = 'none';
 }
 
-// Category Button Interactions
-categoryBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Add click effect
-        btn.style.transform = 'scale(0.98)';
-        setTimeout(() => {
-            btn.style.transform = 'scale(1)';
-        }, 150);
-        
-        // Get category name
-        const categoryCard = btn.closest('.category-card');
-        const categoryTitle = categoryCard.querySelector('.category-title').textContent;
-        
-        console.log(`Exploring category: ${categoryTitle}`);
-        
-        // Simulate category exploration
-        showCategoryModal(categoryTitle);
-    });
-});
-
-// Play Button Interactions
-playBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        
-        // Add click effect
-        btn.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            btn.style.transform = 'scale(1)';
-        }, 150);
-        
-        // Get track info
-        const trendingCard = btn.closest('.trending-card');
-        const trackTitle = trendingCard.querySelector('.trending-title').textContent;
-        const trackArtist = trendingCard.querySelector('.trending-artist').textContent;
-        
-        console.log(`Playing: ${trackTitle} by ${trackArtist}`);
-        
-        // Simulate music preview
-        showMusicPreview(trackTitle, trackArtist);
-    });
-});
-
-// Intersection Observer for Animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
-        }
-    });
-}, observerOptions);
-
-// Observe elements for animation
-document.querySelectorAll('.category-card, .trending-card, .step-card, .about-content').forEach(el => {
-    observer.observe(el);
-});
-
-// Add CSS animation classes
-const style = document.createElement('style');
-style.textContent = `
-    .category-card, .trending-card, .step-card, .about-content {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.6s ease;
-    }
-    
-    .animate-in {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    .nav-menu.active {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 1rem;
-        box-shadow: var(--shadow);
-        border-top: 1px solid var(--border);
-    }
-    
-    .nav-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-    
-    .nav-toggle.active span:nth-child(2) {
-        opacity: 0;
-    }
-    
-    .nav-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-    }
-    
-    .floating-card {
-        transition: all 0.3s ease;
-    }
-    
-    .floating-card:hover {
-        transform: translateY(-10px) scale(1.05);
-        box-shadow: var(--shadow-xl);
-    }
-`;
-document.head.appendChild(style);
-
-// Floating Cards Enhancement
-function enhanceFloatingCards() {
-    const floatingCards = document.querySelectorAll('.floating-card');
-    floatingCards.forEach((card, index) => {
-        card.addEventListener('mouseenter', () => {
-            card.style.zIndex = '10';
-            card.style.transform = 'translateY(-10px) scale(1.05)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.zIndex = '1';
-            card.style.transform = 'translateY(0) scale(1)';
-        });
-    });
+function showRegisterForm() {
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
 }
 
-// Stats Counter Animation
-function animateStats() {
-    const stats = document.querySelectorAll('.stat-number');
-    stats.forEach(stat => {
-        const target = parseInt(stat.textContent.replace(/\D/g, ''));
-        const increment = target / 100;
-        let current = 0;
-        
-        const updateStat = () => {
-            if (current < target) {
-                current += increment;
-                stat.textContent = Math.ceil(current) + 'K+';
-                requestAnimationFrame(updateStat);
-            } else {
-                stat.textContent = target + 'K+';
-            }
+function authenticateUser(userData) {
+    currentUser = userData;
+    isAuthenticated = true;
+    
+    // Update UI
+    userName.textContent = userData.name;
+    userType.textContent = userData.type === 'buyer' ? 'Alıcı' : 'Satıcı';
+    
+    // Hide auth modal and show main app
+    hideAuthModal();
+    
+    // Save to localStorage
+    localStorage.setItem('ripplab_user', JSON.stringify(userData));
+    
+    // Show welcome message
+    showNotification(`Hoş geldiniz, ${userData.name}!`, 'success');
+}
+
+function logoutUser() {
+    currentUser = null;
+    isAuthenticated = false;
+    
+    // Clear localStorage
+    localStorage.removeItem('ripplab_user');
+    
+    // Show auth modal
+    showAuthModal();
+    
+    // Show logout message
+    showNotification('Başarıyla çıkış yapıldı', 'info');
+}
+
+// Form Handling
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showNotification('Lütfen tüm alanları doldurun', 'error');
+        return;
+    }
+    
+    // Simulate login process
+    showNotification('Giriş yapılıyor...', 'info');
+    
+    setTimeout(() => {
+        // Mock user data (in real app, this would come from API)
+        const userData = {
+            name: email.split('@')[0],
+            email: email,
+            type: 'buyer', // Default type
+            id: Date.now()
         };
         
-        updateStat();
-    });
+        authenticateUser(userData);
+    }, 1500);
 }
 
-// Modal Functions
-function showSellerModal() {
-    // Create modal HTML
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Satıcı Hesabı Oluştur</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Müziklerinizi satmaya başlamak için hesap oluşturun!</p>
-                    <div class="modal-actions">
-                        <button class="btn btn-primary">Hesap Oluştur</button>
-                        <button class="btn btn-secondary">Giriş Yap</button>
-                    </div>
-                </div>
-            </div>
+function handleRegister(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const accountType = document.querySelector('input[name="accountType"]:checked').value;
+    const termsAccepted = document.querySelector('input[type="checkbox"]').checked;
+    
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+        showNotification('Lütfen tüm alanları doldurun', 'error');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showNotification('Şifreler eşleşmiyor', 'error');
+        return;
+    }
+    
+    if (!termsAccepted) {
+        showNotification('Kullanım şartlarını kabul etmelisiniz', 'error');
+        return;
+    }
+    
+    // Simulate registration process
+    showNotification('Hesap oluşturuluyor...', 'info');
+    
+    setTimeout(() => {
+        const userData = {
+            name: name,
+            email: email,
+            type: accountType,
+            id: Date.now()
+        };
+        
+        authenticateUser(userData);
+    }, 2000);
+}
+
+// Social Login Functions
+function handleFacebookLogin() {
+    showNotification('Facebook ile giriş yapılıyor...', 'info');
+    
+    // Simulate Facebook OAuth
+    setTimeout(() => {
+        const userData = {
+            name: 'Facebook Kullanıcısı',
+            email: 'facebook@example.com',
+            type: 'buyer',
+            id: Date.now(),
+            provider: 'facebook'
+        };
+        
+        authenticateUser(userData);
+    }, 2000);
+}
+
+function handleGoogleLogin() {
+    showNotification('Google ile giriş yapılıyor...', 'info');
+    
+    // Simulate Google OAuth
+    setTimeout(() => {
+        const userData = {
+            name: 'Google Kullanıcısı',
+            email: 'google@example.com',
+            type: 'buyer',
+            id: Date.now(),
+            provider: 'google'
+        };
+        
+        // Send verification email (simulated)
+        showNotification('Doğrulama e-postası gönderildi!', 'success');
+        
+        setTimeout(() => {
+            authenticateUser(userData);
+        }, 1000);
+    }, 2000);
+}
+
+// Notification System
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
         </div>
+        <button class="notification-close">&times;</button>
     `;
     
-    document.body.appendChild(modal);
+    // Add notification styles
+    if (!document.getElementById('notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--white);
+                border-radius: 8px;
+                box-shadow: var(--shadow-lg);
+                padding: 1rem 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+                border-left: 4px solid;
+                min-width: 300px;
+            }
+            
+            .notification-info {
+                border-left-color: var(--primary);
+            }
+            
+            .notification-success {
+                border-left-color: #10b981;
+            }
+            
+            .notification-error {
+                border-left-color: #ef4444;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex: 1;
+            }
+            
+            .notification i {
+                font-size: 1.25rem;
+            }
+            
+            .notification-info i {
+                color: var(--primary);
+            }
+            
+            .notification-success i {
+                color: #10b981;
+            }
+            
+            .notification-error i {
+                color: #ef4444;
+            }
+            
+            .notification-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--text-light);
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+            
+            .notification-close:hover {
+                background: var(--light-bg);
+                color: var(--text-primary);
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
     
-    // Close modal functionality
-    const closeBtn = modal.querySelector('.modal-close');
-    const overlay = modal.querySelector('.modal-overlay');
+    // Add to page
+    document.body.appendChild(notification);
     
-    closeBtn.addEventListener('click', () => modal.remove());
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) modal.remove();
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+    
+    // Close button functionality
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.remove();
     });
 }
 
-function showCategoryModal(categoryName) {
-    // Create category modal
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>${categoryName} Kategorisi</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>${categoryName} kategorisindeki ürünleri keşfedin!</p>
-                    <div class="modal-actions">
-                        <button class="btn btn-primary">Ürünleri Gör</button>
-                        <button class="btn btn-secondary">Filtrele</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Close modal functionality
-    const closeBtn = modal.querySelector('.modal-close');
-    const overlay = modal.querySelector('.modal-overlay');
-    
-    closeBtn.addEventListener('click', () => modal.remove());
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) modal.remove();
-    });
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'exclamation-circle';
+        case 'info': return 'info-circle';
+        default: return 'info-circle';
+    }
 }
 
-function showMusicPreview(trackTitle, trackArtist) {
-    // Create music preview modal
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Müzik Önizleme</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="preview-player">
-                        <div class="preview-info">
-                            <h4>${trackTitle}</h4>
-                            <p>${trackArtist}</p>
-                        </div>
-                        <div class="preview-controls">
-                            <button class="preview-play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <div class="preview-progress">
-                                <div class="preview-progress-bar"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-primary">Satın Al</button>
-                        <button class="btn btn-secondary">Sepete Ekle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+// Music Player Modal
+function showMusicPlayerModal(trackTitle, trackArtist) {
+    const modal = document.getElementById('musicPlayerModal');
+    const trackTitleElement = document.getElementById('modalTrackTitle');
+    const trackArtistElement = document.getElementById('modalTrackArtist');
     
-    document.body.appendChild(modal);
+    // Update modal content
+    trackTitleElement.textContent = trackTitle;
+    trackArtistElement.textContent = trackArtist;
     
-    // Close modal functionality
-    const closeBtn = modal.querySelector('.modal-close');
-    const overlay = modal.querySelector('.modal-overlay');
-    
-    closeBtn.addEventListener('click', () => modal.remove());
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) modal.remove();
-    });
+    // Show modal
+    modal.style.display = 'flex';
 }
 
-// Add modal styles
-const modalStyle = document.createElement('style');
-modalStyle.textContent = `
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(5px);
-    }
-    
-    .modal-content {
-        background: var(--white);
-        border-radius: 16px;
-        padding: 2rem;
-        max-width: 500px;
-        width: 90%;
-        position: relative;
-        z-index: 1;
-        box-shadow: var(--shadow-xl);
-    }
-    
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .modal-header h3 {
-        color: var(--text-primary);
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .modal-close {
-        background: none;
-        border: none;
-        font-size: 2rem;
-        color: var(--text-secondary);
-        cursor: pointer;
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-    }
-    
-    .modal-close:hover {
-        background: var(--light-bg);
-        color: var(--text-primary);
-    }
-    
-    .modal-body {
-        margin-bottom: 2rem;
-    }
-    
-    .modal-body p {
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-    }
-    
-    .modal-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-    }
-    
-    .preview-player {
-        background: var(--light-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .preview-info {
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    
-    .preview-info h4 {
-        color: var(--text-primary);
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .preview-info p {
-        color: var(--text-secondary);
-        margin: 0;
-    }
-    
-    .preview-controls {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .preview-play-btn {
-        width: 50px;
-        height: 50px;
-        background: var(--primary);
-        color: var(--white);
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .preview-play-btn:hover {
-        background: var(--accent);
-        transform: scale(1.1);
-    }
-    
-    .preview-progress {
-        flex: 1;
-        height: 6px;
-        background: var(--border);
-        border-radius: 3px;
-        overflow: hidden;
-    }
-    
-    .preview-progress-bar {
-        height: 100%;
-        background: var(--primary);
-        width: 30%;
-        border-radius: 3px;
-        transition: width 0.3s ease;
-    }
-`;
-document.head.appendChild(modalStyle);
+function hideMusicPlayerModal() {
+    const modal = document.getElementById('musicPlayerModal');
+    modal.style.display = 'none';
+}
 
-// Initialize Enhancements
+// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    enhanceFloatingCards();
-    
-    // Add loading animation
-    document.body.classList.add('loaded');
-    
-    // Animate stats after a delay
-    setTimeout(animateStats, 1000);
-});
-
-// Add loading animation CSS
-const loadingStyle = document.createElement('style');
-loadingStyle.textContent = `
-    body {
-        opacity: 0;
-        transition: opacity 0.5s ease;
+    // Check if user is already authenticated
+    const savedUser = localStorage.getItem('ripplab_user');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        isAuthenticated = true;
+        hideAuthModal();
+        
+        // Update UI
+        userName.textContent = currentUser.name;
+        userType.textContent = currentUser.type === 'buyer' ? 'Alıcı' : 'Satıcı';
+    } else {
+        showAuthModal();
     }
     
-    body.loaded {
-        opacity: 1;
+    // Form submissions
+    const loginFormElement = document.querySelector('.login-form');
+    const registerFormElement = document.querySelector('.register-form');
+    
+    if (loginFormElement) {
+        loginFormElement.addEventListener('submit', handleLogin);
     }
-`;
-document.head.appendChild(loadingStyle);
-
-// Keyboard Controls
-document.addEventListener('keydown', (e) => {
-    switch(e.code) {
-        case 'Escape':
-            // Close any open modals
+    
+    if (registerFormElement) {
+        registerFormElement.addEventListener('submit', handleRegister);
+    }
+    
+    // Navigation between forms
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegisterForm();
+        });
+    }
+    
+    if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginForm();
+        });
+    }
+    
+    // Social login buttons
+    const facebookBtns = document.querySelectorAll('.facebook-btn');
+    const googleBtns = document.querySelectorAll('.google-btn');
+    
+    facebookBtns.forEach(btn => {
+        btn.addEventListener('click', handleFacebookLogin);
+    });
+    
+    googleBtns.forEach(btn => {
+        btn.addEventListener('click', handleGoogleLogin);
+    });
+    
+    // Logout
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutUser();
+        });
+    }
+    
+    // Music player modal
+    const playBtns = document.querySelectorAll('.play-btn');
+    const modalCloseBtns = document.querySelectorAll('.modal-close');
+    
+    playBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            const trackTitle = btn.closest('.product-card').querySelector('.product-title').textContent;
+            const trackArtist = btn.closest('.product-card').querySelector('.product-artist').textContent;
+            
+            showMusicPlayerModal(trackTitle, trackArtist);
+        });
+    });
+    
+    modalCloseBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
             const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => modal.remove());
-            break;
+            modals.forEach(modal => {
+                if (modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    });
+    
+    // Product interactions
+    const likeBtns = document.querySelectorAll('.like-btn');
+    const cartBtns = document.querySelectorAll('.cart-btn');
+    const buyBtns = document.querySelectorAll('.buy-btn');
+    
+    likeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const icon = btn.querySelector('i');
+            
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                icon.style.color = '#ef4444';
+                showNotification('Beğenilere eklendi', 'success');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                icon.style.color = '';
+                showNotification('Beğenilerden çıkarıldı', 'info');
+            }
+        });
+    });
+    
+    cartBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showNotification('Sepete eklendi', 'success');
+        });
+    });
+    
+    buyBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const productTitle = btn.closest('.product-card').querySelector('.product-title').textContent;
+            showNotification(`${productTitle} satın alınıyor...`, 'info');
+        });
+    });
+    
+    // Filter interactions
+    const filterItems = document.querySelectorAll('.filter-item');
+    const clearFiltersBtn = document.querySelector('.clear-filters-btn');
+    
+    filterItems.forEach(item => {
+        item.addEventListener('change', () => {
+            // Simulate filter application
+            showNotification('Filtreler uygulandı', 'info');
+        });
+    });
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+            // Reset all filters
+            const checkboxes = document.querySelectorAll('.filter-item input[type="checkbox"]');
+            const radios = document.querySelectorAll('.filter-item input[type="radio"]');
+            
+            checkboxes.forEach(cb => cb.checked = false);
+            radios.forEach(rb => rb.checked = false);
+            
+            // Check first radio button
+            if (radios.length > 0) {
+                radios[0].checked = true;
+            }
+            
+            showNotification('Filtreler temizlendi', 'info');
+        });
+    }
+    
+    // View toggle
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const productsGrid = document.getElementById('productsGrid');
+    
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            viewBtns.forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            const viewType = btn.getAttribute('data-view');
+            
+            if (viewType === 'list') {
+                productsGrid.style.gridTemplateColumns = '1fr';
+                showNotification('Liste görünümü aktif', 'info');
+            } else {
+                productsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                showNotification('Grid görünümü aktif', 'info');
+            }
+        });
+    });
+    
+    // Pagination
+    const pageBtns = document.querySelectorAll('.page-btn');
+    
+    pageBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.classList.contains('active')) return;
+            
+            // Remove active class from all buttons
+            pageBtns.forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            showNotification(`Sayfa ${btn.textContent} yükleniyor...`, 'info');
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (query.length > 2) {
+                // Simulate search
+                showNotification(`"${query}" için arama yapılıyor...`, 'info');
+            }
+        });
+    }
+    
+    // Welcome message
+    if (isAuthenticated) {
+        setTimeout(() => {
+            showNotification(`Hoş geldiniz, ${currentUser.name}!`, 'success');
+        }, 1000);
     }
 });
 
@@ -582,7 +574,8 @@ document.addEventListener('keydown', (e) => {
 console.log(`
 🌊 Ripplab Music Marketplace 🌊
 🎵 Welcome to the music marketplace! 🎵
+🔐 Authentication system enabled
+✨ Social login with Facebook & Google
+💼 Buyer/Seller account types
 🚀 Built with modern web technologies
-✨ Enjoy the smooth animations and beautiful design
-💼 Buy and sell music assets
 `);
