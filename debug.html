@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ripplab Debug - Authentication Test</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="debug-info" style="position: fixed; top: 10px; left: 10px; background: white; padding: 10px; border: 1px solid #ccc; z-index: 10000; font-family: monospace; font-size: 12px;">
+        <h3>Debug Info</h3>
+        <div id="element-status"></div>
+        <div id="auth-status"></div>
+        <button onclick="testAuth()">Test Auth</button>
+        <button onclick="showAuth()">Show Auth Modal</button>
+        <button onclick="hideAuth()">Hide Auth Modal</button>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <!-- Login Form -->
+            <div class="auth-form" id="loginForm">
+                <div class="auth-header">
+                    <div class="logo">
+                        <div class="logo-icon">🌊</div>
+                        <span class="logo-text">Ripplab</span>
+                    </div>
+                    <h2>Hoş Geldiniz</h2>
+                    <p>Hesabınıza giriş yapın</p>
+                </div>
+                
+                <form class="login-form">
+                    <div class="form-group">
+                        <label for="loginEmail">E-posta</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Şifre</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span>Beni hatırla</span>
+                        </label>
+                        <a href="#" class="forgot-password">Şifremi unuttum</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">Giriş Yap</button>
+                </form>
+                
+                <div class="divider">
+                    <span>veya</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn facebook-btn">
+                        <i class="fab fa-facebook-f"></i>
+                        Facebook ile Giriş
+                    </button>
+                    <button type="button" class="social-btn google-btn">
+                        <i class="fab fa-google"></i>
+                        Google ile Giriş
+                    </button>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>Hesabınız yok mu? <a href="#" id="showRegister">Kayıt olun</a></p>
+                </div>
+            </div>
+            
+            <!-- Register Form -->
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <div class="auth-header">
+                    <div class="logo">
+                        <div class="logo-icon">🌊</div>
+                        <span class="logo-text">Ripplab</span>
+                    </div>
+                    <h2>Hesap Oluşturun</h2>
+                    <p>Müzik dünyasına katılın</p>
+                </div>
+                
+                <form class="register-form">
+                    <div class="form-group">
+                        <label for="registerName">Ad Soyad</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail">E-posta</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">Şifre</label>
+                        <input type="password" id="registerPassword" required>
+                        <div class="password-strength">Şifre gücü: Zayıf</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Şifre Tekrar</label>
+                        <input type="password" id="registerConfirmPassword" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Hesap Türü</label>
+                        <div class="account-type-selector">
+                            <label class="type-option">
+                                <input type="radio" name="accountType" value="buyer" checked>
+                                <div class="type-card">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span>Alıcı</span>
+                                    <small>Müzik satın al</small>
+                                </div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="accountType" value="seller">
+                                <div class="type-card">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Satıcı</span>
+                                    <small>Müzik sat</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            <span>Kullanım şartlarını ve gizlilik politikasını kabul ediyorum</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">Hesap Oluştur</button>
+                </form>
+                
+                <div class="divider">
+                    <span>veya</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn facebook-btn">
+                        <i class="fab fa-google"></i>
+                        Facebook ile Kayıt
+                    </button>
+                    <button type="button" class="social-btn google-btn">
+                        <i class="fab fa-google"></i>
+                        Google ile Kayıt
+                    </button>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>Zaten hesabınız var mı? <a href="#" id="showLogin">Giriş yapın</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="main-app" id="mainApp">
+        <h1>Main App Content</h1>
+        <p>This should be hidden until login</p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Debug functions
+        function updateDebugInfo() {
+            const elementStatus = document.getElementById('element-status');
+            const authStatus = document.getElementById('auth-status');
+            
+            // Check if elements exist
+            const elements = {
+                'authModal': document.getElementById('authModal'),
+                'mainApp': document.getElementById('mainApp'),
+                'loginForm': document.getElementById('loginForm'),
+                'registerForm': document.getElementById('registerForm'),
+                'showRegister': document.getElementById('showRegister'),
+                'showLogin': document.getElementById('showLogin'),
+                'logoutBtn': document.getElementById('logoutBtn'),
+                'userName': document.getElementById('userName'),
+                'userType': document.getElementById('userType'),
+                'userMenu': document.getElementById('userMenu')
+            };
+            
+            let elementHtml = '<h4>Elements:</h4>';
+            Object.entries(elements).forEach(([name, element]) => {
+                elementHtml += `<div>${name}: ${element ? '✓' : '✗'}</div>`;
+            });
+            
+            elementStatus.innerHTML = elementHtml;
+            
+            // Check auth status
+            const user = localStorage.getItem('ripplab_user');
+            authStatus.innerHTML = `
+                <h4>Auth Status:</h4>
+                <div>User: ${user ? 'Logged in' : 'Not logged in'}</div>
+                <div>User Data: ${user || 'None'}</div>
+            `;
+        }
+        
+        function testAuth() {
+            console.log('Testing authentication system...');
+            console.log('Global variables:', { currentUser, isAuthenticated });
+            console.log('DOM elements:', {
+                authModal: document.getElementById('authModal'),
+                mainApp: document.getElementById('mainApp')
+            });
+        }
+        
+        function showAuth() {
+            const authModal = document.getElementById('authModal');
+            const mainApp = document.getElementById('mainApp');
+            if (authModal && mainApp) {
+                authModal.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+            }
+        }
+        
+        function hideAuth() {
+            const authModal = document.getElementById('authModal');
+            const mainApp = document.getElementById('mainApp');
+            if (authModal && mainApp) {
+                authModal.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('ripplab_user');
+            showAuth();
+            updateDebugInfo();
+        }
+        
+        // Update debug info every second
+        setInterval(updateDebugInfo, 1000);
+        
+        // Initial update
+        updateDebugInfo();
+        
+        // Check if auth system initialized
+        setTimeout(() => {
+            console.log('Auth system check after 2 seconds:');
+            console.log('Global variables:', { currentUser, isAuthenticated });
+            console.log('DOM elements:', {
+                authModal: document.getElementById('authModal'),
+                mainApp: document.getElementById('mainApp')
+            });
+        }, 2000);
+    </script>
+</body>
+</html>
